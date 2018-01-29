@@ -3,13 +3,13 @@ close all
 clc
 
 % ANN Project 1
-% Create data which is then used for binary classification
+% Create data which is then used for perceptron learning
 
-%%          3.1.1 Datasets
+%%          3.1.1 create Datasets
 % Create 2 datasets of multivariant distribution(with mu and sigma)
 % with linearly seperable data (100 points per class)
 
-%rng default;
+%rng default;                    %Will always produce the same randon data
 % first group od data
 mu1 = [10,4];
 sigma1 = [10,1;1,10];
@@ -50,7 +50,7 @@ plot(all_data(1,101:200),all_data(2,101:200),'r+')
 alpha = 0.7;
 eta = 0.001;
 max_iter = 100;
-min_error = 0;
+%min_error = 0;
 
 % create a weight matrix
 [numDims, numInst] = size(all_data);
@@ -81,8 +81,10 @@ while iter <= max_iter
         weights(1,1) = weights(1,1) + delta_weight(1,1) .* eta;
         delta_weight(1,2) = (delta_weight(1,2) .* alpha) - (delta_out * all_data(2,:)') .* (1-alpha);
         weights(1,2) = weights(1,2) + delta_weight(1,2) .* eta;
-        delta_weight(1,3) = (delta_weight(1,3) .* alpha) - (delta_out * all_data(3,:)') .* (1-alpha); %bias weight update
+        %bias weight update
+        delta_weight(1,3) = (delta_weight(1,3) .* alpha) - (delta_out * all_data(3,:)') .* (1-alpha);
         weights(1,3) = weights(1,3) + delta_weight(1,3) .* eta;
+        
     %end
 
 %Plotting of weights
@@ -92,10 +94,24 @@ pointx = [-20*weights(1,1),20*weights(1,1)];
 pointy = [20*weights(1,2),-20*weights(1,2)];
 line(pointx,pointy,'Color','black','LineStyle','-')
 
-weights
-
 pause(0.1)
 end
 hold off
 
+% Calculate mean square error
+meansquare_error = mean(delta_out.^2)
+% Show misclassifications
+missclass = 0;
+for i = 1:length(target)
+    if target(i) ~= round(out(i))
+        missclass = missclass + 1;
+        missclass_data = i;
+    end
+end
+
+missclass
+
 %% delta learning
+
+
+
