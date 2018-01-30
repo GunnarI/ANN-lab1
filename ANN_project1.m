@@ -10,7 +10,8 @@ clc
 % with linearly seperable data (100 points per class)
 
 %rng default;                    %Will always produce the same randon data
-% first group od data
+
+% first group of data
 mu1 = [10,4];
 sigma1 = [10,1;1,10];
 data1 = mvnrnd(mu1,sigma1,100);
@@ -20,16 +21,20 @@ mu2 = [-10,-4];
 sigma2 = [10,1;1,10];
 data2 = mvnrnd(mu2,sigma2,100);
 
-% combine data into one matrix
+% combine data into one matrix with bias line in input
 all_data = [data1; data2];
 all_data = all_data';
 bias = ones(1,200);
 all_data = [all_data; bias];
 
 % Create an output matrix
-target1 = ones(1,100);
-target2 = -1.*ones(1,100);
-target = [target1, target2];
+target = [ones(1,100), -ones(1,100)];
+
+% create a weight matrix
+[numDims, numInst] = size(all_data);
+numClasses = size(target,1);
+weights = zeros(numClasses, numDims);
+delta_weight = zeros(numClasses, numDims);
 
 %%          Plotting
 
@@ -52,12 +57,6 @@ eta = 0.001;
 max_iter = 100;
 %min_error = 0;
 
-% create a weight matrix
-[numDims, numInst] = size(all_data);
-numClasses = size(target,1);
-weights = rand(numClasses, numDims);
-delta_weight = zeros(numClasses, numDims);
-
 % actual output of each epoch
 out = zeros(1,200);
 iter = 0;
@@ -69,12 +68,12 @@ while iter <= max_iter
         
         % forward pass
         y = all_data(1,:) * weights(1,1)...
-            + all_data(2,:) * weights(1,2)...
-            + all_data(3,:) * weights(1,3);                                 %bias part
+            + all_data(2,:) * weights(1,2);...
+            %+ all_data(3,:) * weights(1,3);                               %bias part
         out = 2./(1 + exp(-y)) - 1;
         
         %backward pass
-        delta_out = (out - target).*(1 + out).*(1 - out).*0.5;
+        delta_out = (out - target).*(1 + out).*(1 - out)*0.5;
         
         %weight update
         delta_weight(1,1) = (delta_weight(1,1) .* alpha) - (delta_out * all_data(1,:)') .* (1-alpha);
