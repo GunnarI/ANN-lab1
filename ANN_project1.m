@@ -90,7 +90,7 @@ while iter <= max_iter
 %Plotting of weights
 hold on
 axis([-20 20 -20 20])
-pointx = [-20*weights(1,1),20*weights(1,1)];
+pointx = [(-20*weights(1,1) + weights(1,3)), (20*weights(1,1) + weights(1,3))];
 pointy = [20*weights(1,2),-20*weights(1,2)];
 line(pointx,pointy,'Color','black','LineStyle','-')
 
@@ -103,7 +103,10 @@ meansquare_error = mean(delta_out.^2)
 % Show misclassifications
 missclass = 0;
 for i = 1:length(target)
-    if target(i) ~= round(out(i))
+    if i <= 100 && out(i) < 0
+        missclass = missclass + 1;
+        missclass_data = i;
+    elseif i > 100 && out(i) > 0
         missclass = missclass + 1;
         missclass_data = i;
     end
