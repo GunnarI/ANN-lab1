@@ -18,7 +18,7 @@ data1 = mvnrnd(mu1,sigma1,100);  %Produces multivariant normal distributed data
 
 %second group of data
 mu2 = [-5,-5];
-sigma2 = [2,1;1,2];
+sigma2 = [3,1;1,3];
 data2 = mvnrnd(mu2,sigma2,100);  %Produces multivariant normal distributed data
 
 % combine data into one matrix and add bias line in input
@@ -28,6 +28,11 @@ all_data = [all_data; ones(1,200)]; %All data including the bias line
 
 % Create an output matrix
 target = [ones(1,100), -ones(1,100)];   %first data group is 1 and second is -1
+
+%shuffle data by random
+shuffle = randperm(200);
+all_data = all_data(:,shuffle);
+target = target(:,shuffle);
 
 % create a weight matrix
 [numDims, numInst] = size(all_data);
@@ -105,3 +110,8 @@ for i = 1:length(target)
 end
 
 missclass
+
+
+
+
+
