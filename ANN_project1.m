@@ -1,5 +1,5 @@
-clear all
 close all
+clear all
 clc
 
 % ANN Project 1
@@ -12,13 +12,13 @@ clc
 %rng default;                    %Will always produce the same randon data
 
 % first group of data
-mu1 = [10,4];
-sigma1 = [10,1;1,10];
+mu1 = [5,5];
+sigma1 = [2,1;1,2];
 data1 = mvnrnd(mu1,sigma1,100);  %Produces multivariant normal distributed data
 
 %second group of data
-mu2 = [-10,-4];
-sigma2 = [10,1;1,10];
+mu2 = [-5,-5];
+sigma2 = [2,1;1,2];
 data2 = mvnrnd(mu2,sigma2,100);  %Produces multivariant normal distributed data
 
 % combine data into one matrix and add bias line in input
@@ -32,7 +32,7 @@ target = [ones(1,100), -ones(1,100)];   %first data group is 1 and second is -1
 % create a weight matrix
 [numDims, numInst] = size(all_data);
 numClasses = size(target,1);
-weights = rand(numClasses, numDims);
+weights = zeros(numClasses, numDims);
 delta_weights = zeros(numClasses, numDims);
 
 %%          Plotting of data points
@@ -61,9 +61,9 @@ while iter <= max_iter
     iter = iter + 1;
     
     % forward pass
-    y = weights * all_data;                         %Bias part is included in both the weights and the data
-    %out = 2./(1 + exp(-y)) - 1;                    %transferfunction to -1 and 1
-    delta_weights = -eta.*(y - target)*all_data';    %change in weight function
+    out = weights*all_data;                         %Bias part is included in both the weights and the data
+    %out = 2./(1 + exp(-out)) - 1;                    %transferfunction to -1 and 1, NOT for delta function
+    delta_weights = -eta.*(out - target)*all_data';    %change in weight function
     
     %weight update
     weights = weights + delta_weights;
@@ -75,7 +75,7 @@ while iter <= max_iter
     
     %Plotting of weights
     hold on
-    axis([-20 20 -20 20])
+    axis([-10 10 -10 10])
     x = [weights(1),weights(1)];
     y = [weights(2),weights(2)];
     x2 = [weights(1),-weights(1)];
@@ -88,23 +88,20 @@ while iter <= max_iter
 end
 hold off
 
+
 % Calculate mean square error
-meansquare_error = mean(delta_out.^2)
+meansquare_error = mean(delta_weights.^2)
+
 % Show misclassifications
 missclass = 0;
 for i = 1:length(target)
-    if i <= 100 && y(i) < 0
+    if i <= length(target)/2 && out(i) < 0
         missclass = missclass + 1;
         missclass_data = i;
-    elseif i > 100 && y(i) > 0
+    elseif i > length(target)/2 && out(i) > 0
         missclass = missclass + 1;
         missclass_data = i;
     end
 end
 
 missclass
-
-
-
-
-
