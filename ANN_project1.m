@@ -15,15 +15,11 @@ clc
 mu1 = [10,4];
 sigma1 = [10,1;1,10];
 data1 = mvnrnd(mu1,sigma1,100);  %Produces multivariant normal distributed data
-data1(:,1) = data1(:,1)./10;
-data1(:,2) = data1(:,2)./4;
 
 %second group of data
 mu2 = [-10,-4];
 sigma2 = [10,1;1,10];
 data2 = mvnrnd(mu2,sigma2,100);  %Produces multivariant normal distributed data
-data2(:,1) = data2(:,1)./10;
-data2(:,2) = data2(:,2)./4;
 
 % combine data into one matrix and add bias line in input
 all_data = [data1; data2];
@@ -37,7 +33,7 @@ target = [ones(1,100), -ones(1,100)];   %first data group is 1 and second is -1
 [numDims, numInst] = size(all_data);
 numClasses = size(target,1);
 weights = rand(numClasses, numDims);
-delta_weight = zeros(numClasses, numDims);
+delta_weights = zeros(numClasses, numDims);
 
 %%          Plotting of data points
 
@@ -63,25 +59,28 @@ iter = 0;           %iteration counter
 
 while iter <= max_iter
     iter = iter + 1;
+    
     % forward pass
-    y = weights * all_data;         %Bias part is included in both the weights and the data
-    %out = 2./(1 + exp(-y)) - 1;     %transfer to -1 and 1
-        
-    %backward pass
-    %delta_out = (out - target).*(1 + out).*(1 - out)*0.5;
-    delta_out = (target - y);
-     
+    y = weights * all_data;                         %Bias part is included in both the weights and the data
+    %out = 2./(1 + exp(-y)) - 1;                    %transferfunction to -1 and 1
+    delta_weights = -eta.*(y - target)*all_data';    %change in weight function
+    
     %weight update
-    weights(1,1) = weights(1,1) + eta.*delta_out*all_data(1,:)';
-    weights(1,2) = weights(1,2) + eta.*delta_out*all_data(2,:)';
-    weights(1,3) = weights(1,3) + eta.*delta_out*all_data(3,:)';  
-
+    weights = weights + delta_weights;
+    
+    %plotting data with bias
+    data_weights = weights(1,1:2);
+    threshold = weights(1,3)/(data_weights*data_weights');      %normalised bias is threshold
+    norm_weights = sqrt(data_weights*data_weights');
+    
     %Plotting of weights
     hold on
     axis([-20 20 -20 20])
-    pointx = [(-20*weights(1,1) + weights(1,3)), (20*weights(1,1) + weights(1,3))]; %Bias-weight is added to the x-value
-    pointy = [20*weights(1,2),-20*weights(1,2)];
-    line(pointx,pointy,'Color','black','LineStyle','-')
+    x = [weights(1),weights(1)];
+    y = [weights(2),weights(2)];
+    x2 = [weights(1),-weights(1)];
+    y2 = [-weights(2),weights(2)];
+    line(x*threshold + x2/norm_weights, y*threshold + x2/norm_weights, 'Color','black','LineStyle','-')
 
     weights
     pause(0.1)
