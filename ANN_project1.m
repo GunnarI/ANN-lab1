@@ -15,11 +15,15 @@ clc
 mu1 = [10,4];
 sigma1 = [10,1;1,10];
 data1 = mvnrnd(mu1,sigma1,100);  %Produces multivariant normal distributed data
+data1(:,1) = data1(:,1)./10;
+data1(:,2) = data1(:,2)./4;
 
 %second group of data
 mu2 = [-10,-4];
 sigma2 = [10,1;1,10];
 data2 = mvnrnd(mu2,sigma2,100);  %Produces multivariant normal distributed data
+data2(:,1) = data2(:,1)./10;
+data2(:,2) = data2(:,2)./4;
 
 % combine data into one matrix and add bias line in input
 all_data = [data1; data2];
