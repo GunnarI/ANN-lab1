@@ -1,9 +1,12 @@
-function missclass = singleDeltaRule(patterns, targets, eta, weights, epoch, plotId)
+function [missclass, timevector] = singleDeltaRule(patterns, targets, eta, weights, epoch, plotId)
 
 max_iter = epoch;     %Max number of iterations
 iter = 0;           %iteration counter
 
 h = animatedline;
+
+timevector = zeros(1,max_iter);
+tstart = tic;
 while iter <= max_iter
     iter = iter + 1;
     % forward pass
@@ -50,10 +53,11 @@ while iter <= max_iter
     end
    
 
-    %weights
-    pause(0.1)
+    timevector(iter) = toc(tstart);
+    %pause(0.1)
 
 end
+h.Color = 'blue';
 hold off
 
 % Show misclassifications

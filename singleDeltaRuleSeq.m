@@ -1,7 +1,9 @@
-function [missclass, timevector] = singlePerceptronLearning(patterns, targets, eta, weights, epoch, plotId)
+function [missclass, timevector] = singleDeltaRuleSeq(patterns, targets, eta, weights, epoch, plotId)
 
 max_iter = epoch;     %Max number of iterations
 iter = 0;           %iteration counter
+
+out = zeros(1,length(patterns));
 
 h = animatedline;
 
@@ -9,17 +11,19 @@ timevector = zeros(1,max_iter);
 tstart = tic;
 while iter <= max_iter
     iter = iter + 1;
-    % forward pass
-    out = weights * patterns;   %Bias part is included in both the weights and the data
-    
-    %backward pass
-    delta_out = (targets - sign(out));
+    for k = 1:length(patterns)
+        % forward pass
+        out(k) = weights * patterns(:,k);   %Bias part is included in both the weights and the data
 
-    %weight update
-    weights(1,1) = weights(1,1) + eta.*delta_out*patterns(1,:)';
-    weights(1,2) = weights(1,2) + eta.*delta_out*patterns(2,:)';
-    weights(1,3) = weights(1,3) + eta.*delta_out*patterns(3,:)';
+        %backward pass
+        delta_out = (targets(k) - out(k));
 
+        %weight update
+        weights(1,1) = weights(1,1) + eta.*delta_out*patterns(1,k)';
+        weights(1,2) = weights(1,2) + eta.*delta_out*patterns(2,k)';
+        weights(1,3) = weights(1,3) + eta.*delta_out*patterns(3,k)';
+
+    end
     if plotId
         %plotting data with bias
         data_weights = weights(1,1:2);
@@ -49,13 +53,14 @@ while iter <= max_iter
         end
         addpoints(h,iter-1,missclass);
         drawnow;
+        
     end
-
+   
     timevector(iter) = toc(tstart);
     %pause(0.1)
-
+    
 end
-h.Color = 'red';
+h.Color = 'blue';
 hold off
 
 % Show misclassifications

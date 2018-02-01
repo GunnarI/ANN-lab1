@@ -47,7 +47,7 @@ eta = 0.001;
 
 
 etavec = [0.0001,0.001,0.005,0.01,0.1];
-epoch = [10 25 50 75 100];
+epoch = [10 25 50];
 
 weights = randn(1, numDims);
 
@@ -65,12 +65,12 @@ for epoch_i = 1:length(epoch)
         hold on
         plot(patterns(1,101:200),patterns(2,101:200),'r+')
     else
-        title(['Single Layer - Delta Rule with Epoch = ' num2str(epoch(epoch_i))])
+        title(['Single Layer (Batch learning) - Epoch = ' num2str(epoch(epoch_i))])
         xlabel('Epoch')
         ylabel('Misclassifications')
     end
         
-    misclass_delta = ...
+    [misclass_delta, timevec_delta] = ...
         singleDeltaRule(patternsShuf, targets, eta, weights, epoch(epoch_i), plotId);
     
     if plotId
@@ -83,14 +83,52 @@ for epoch_i = 1:length(epoch)
 
         hold on
         plot(patterns(1,101:200),patterns(2,101:200),'r+')
+    end
+    
+    [misclass_percept, timevec_percept] = ...
+        singlePerceptronLearning(patternsShuf, targets, eta, weights, epoch(epoch_i), plotId);
+    
+    if ~plotId
+        legend('Delta Rule','Perceptron Learning')
+    end
+    
+    
+    figure
+    if plotId
+        plot(patterns(1,1:100),patterns(2,1:100),'bo')
+        grid on
+        title(['Single Layer - Delta Rule with Epoch = ' num2str(epoch(epoch_i))])
+        xlabel('X')
+        ylabel('Y')
+
+        hold on
+        plot(patterns(1,101:200),patterns(2,101:200),'r+')
     else
-        title(['Single Layer - Perceptron Learning with Epoch = ' num2str(epoch(epoch_i))])
+        title(['Single Layer (Sequental learning) - Epoch = ' num2str(epoch(epoch_i))])
         xlabel('Epoch')
         ylabel('Misclassifications')
     end
     
-    misclass_percept = ...
-        singlePerceptronLearning(patternsShuf, targets, eta, weights, epoch(epoch_i), plotId);
+    [misclass_delta_seq, timevec_delta_seq] = singleDeltaRuleSeq(patternsShuf, targets, eta, weights, epoch(epoch_i), plotId);
+    
+    
+    [misclass_percept_seq, timevec_percept_seq] = ...
+        singlePerceptronLearningSeq(patternsShuf, targets, eta, weights, epoch(epoch_i), plotId);
+    
+    
+    figure
+    plot(timevec_delta,'b-')
+    hold on
+    plot(timevec_percept,'r-')
+    hold on
+    plot(timevec_delta_seq,'y--')
+    hold on
+    plot(timevec_percept_seq, 'g--')
+    title(['Single Layer (Batch learning) - Epoch = ' num2str(epoch(epoch_i))])
+    xlabel('Epoch')
+    ylabel('Time')
+    legend('Delta Rule','Perceptron Learning', 'Sequental Delta Rule', 'Sequential Perceptron Learning')
+    
     
     fprintf('\t\t\tMisclassifications\n')
     fprintf('\t\t\tDelta Rule\tPerceptron Learning\n')
